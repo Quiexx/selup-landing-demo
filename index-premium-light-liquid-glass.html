@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SelUP — сервис привлечения клиентов для селлеров</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#F5FBFF",
+                        "background-dark": "#102216",
+                        "brand-navy": "#0d1b12",
+                        "brand-muted": "#4c9a66",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2 { font-family: 'Sora', 'Manrope', sans-serif; letter-spacing: -0.02em; }
+        .material-symbols-outlined { font-size: 24px; vertical-align: middle; }
+
+        :root {
+            --lp-scroll: 0;
+            --lp-scroll-n: 0;
+            --lp-vh: 0;
+            --lp-t: 0;
+        }
+
+        body.lp-glass {
+            background: #F5FBFF;
+        }
+
+        body.lp-glass::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(900px 560px at 12% 14%, rgba(120, 180, 255, 0.30), transparent 62%),
+                radial-gradient(900px 620px at 82% 18%, rgba(170, 255, 223, 0.32), transparent 62%),
+                radial-gradient(900px 620px at 45% 95%, rgba(255, 190, 240, 0.24), transparent 60%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.62));
+            opacity: 1;
+        }
+
+        body.lp-glass::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+            background-size: 540px 540px;
+            mix-blend-mode: multiply;
+            opacity: 0.10;
+        }
+
+        main, header, footer { position: relative; z-index: 2; }
+
+        body.lp-glass header {
+            background: rgba(245, 251, 255, 0.70) !important;
+            border-bottom-color: rgba(13, 27, 18, 0.10) !important;
+        }
+
+        body.lp-glass .text-brand-muted {
+            color: rgba(13, 27, 18, 0.62) !important;
+        }
+
+        .lp-orbs {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .lp-orb {
+            position: absolute;
+            border-radius: 9999px;
+            background:
+                radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.00) 56%),
+                radial-gradient(circle at 70% 40%, rgba(19, 236, 91, 0.18), rgba(255, 255, 255, 0) 60%),
+                radial-gradient(circle at 40% 70%, rgba(120, 180, 255, 0.22), rgba(255, 255, 255, 0) 62%);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            box-shadow:
+                0 34px 120px rgba(13, 27, 18, 0.10),
+                inset 0 1px 0 rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            mix-blend-mode: soft-light;
+            transform:
+                translate3d(calc(var(--lp-scroll-n) * var(--dx)), calc(var(--lp-scroll-n) * var(--dy)), 0)
+                scale(calc(0.92 + (var(--lp-scroll-n) * 0.12)));
+            opacity: 0.9;
+        }
+
+        .lp-orb.o1 { width: 440px; height: 440px; left: -120px; top: 90px; --dx: 90px; --dy: -60px; }
+        .lp-orb.o2 { width: 520px; height: 520px; right: -180px; top: 120px; --dx: -120px; --dy: -40px; }
+        .lp-orb.o3 { width: 380px; height: 380px; left: 22%; bottom: -140px; --dx: 70px; --dy: -120px; }
+        .lp-orb.o4 { width: 220px; height: 220px; right: 14%; bottom: 18%; --dx: -80px; --dy: 60px; opacity: 0.75; }
+
+        body.lp-glass main > section.bg-white,
+        body.lp-glass main > section.bg-background-light {
+            background-color: rgba(255, 255, 255, 0.35) !important;
+        }
+
+        body.lp-glass .lp-surface {
+            background: rgba(255, 255, 255, 0.55) !important;
+            border: 1px solid rgba(13, 27, 18, 0.10) !important;
+            box-shadow:
+                0 20px 70px rgba(13, 27, 18, 0.10),
+                inset 0 1px 0 rgba(255, 255, 255, 0.80);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        body.lp-glass .lp-lift {
+            transition: transform 240ms cubic-bezier(.2,.8,.2,1), box-shadow 240ms ease;
+            will-change: transform;
+        }
+
+        body.lp-glass .lp-lift:hover {
+            transform: translateY(-5px);
+            box-shadow:
+                0 30px 110px rgba(13, 27, 18, 0.14),
+                0 0 0 1px rgba(19, 236, 91, 0.14),
+                inset 0 1px 0 rgba(255, 255, 255, 0.86);
+        }
+
+        body.lp-glass .lp-cta {
+            border: 1px solid rgba(19, 236, 91, 0.35) !important;
+            background-image: linear-gradient(180deg, rgba(19, 236, 91, 1), rgba(19, 236, 91, 0.86)) !important;
+            box-shadow:
+                0 18px 60px rgba(19, 236, 91, 0.16),
+                inset 0 1px 0 rgba(255, 255, 255, 0.70);
+        }
+
+        body.lp-glass .lp-hero-visual {
+            background:
+                radial-gradient(600px 360px at 35% 22%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 58%),
+                radial-gradient(650px 420px at 70% 35%, rgba(120, 180, 255, 0.20), rgba(255, 255, 255, 0) 62%),
+                rgba(255, 255, 255, 0.45) !important;
+        }
+
+        @media (max-width: 767px) {
+            .lp-orbs { display: none; }
+            body.lp-glass .lp-surface { backdrop-filter: none; -webkit-backdrop-filter: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body.lp-glass * { animation: none !important; transition: none !important; }
+            body.lp-glass .lp-lift:hover { transform: none !important; }
+            .lp-orb { transform: none !important; }
+        }
+    </style>
+</head>
+<body class="lp-glass bg-background-light dark:bg-background-dark text-brand-navy dark:text-white font-display transition-colors duration-300">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div aria-hidden="true" class="lp-orbs">
+<div class="lp-orb o1"></div>
+<div class="lp-orb o2"></div>
+<div class="lp-orb o3"></div>
+<div class="lp-orb o4"></div>
+</div>
+<!-- Header -->
+<header class="sticky top-0 z-50 w-full border-b border-solid border-[#e7f3eb] dark:border-white/10 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="mx-auto max-w-[1200px] px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="text-primary">
+<svg class="size-8" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 18.4228L42 11.475V34.3663C42 34.7796 41.7457 35.1504 41.3601 35.2992L24 42V18.4228Z" fill="currentColor" fill-rule="evenodd"></path>
+<path clip-rule="evenodd" d="M24 8.18819L33.4123 11.574L24 15.2071L14.5877 11.574L24 8.18819ZM9 15.8487L21 20.4805V37.6263L9 32.9945V15.8487ZM27 37.6263V20.4805L39 15.8487V32.9945L27 37.6263ZM25.354 2.29885C24.4788 1.98402 23.5212 1.98402 22.646 2.29885L4.98454 8.65208C3.7939 9.08038 3 10.2097 3 11.475V34.3663C3 36.0196 4.01719 37.5026 5.55962 38.098L22.9197 44.7987C23.6149 45.0671 24.3851 45.0671 25.0803 44.7987L42.4404 38.098C43.9828 37.5026 45 36.0196 45 34.3663V11.475C45 10.2097 44.2061 9.08038 43.0155 8.65208L25.354 2.29885Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="text-xl font-extrabold tracking-tight">SelUP</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#features">Возможности</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#process">Как это работает</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#pricing">Тарифы</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#contacts">Контакты</a>
+</nav>
+<a class="lp-cta bg-primary text-brand-navy text-sm font-bold px-5 py-2.5 rounded-lg shadow-sm hover:brightness-105 active:scale-95 transition-all" href="#contacts">
+                    Получить консультацию
+                </a>
+</div>
+</header>
+<main class="flex-1">
+<!-- Hero Section -->
+<section class="relative px-6 py-16 md:py-24 bg-white dark:bg-background-dark">
+<div class="mx-auto max-w-[1200px] grid md:grid-cols-2 gap-12 items-center">
+<div class="flex flex-col gap-8">
+<div class="flex flex-col gap-4">
+<h1 class="text-4xl md:text-6xl font-black leading-[1.1] tracking-tight text-brand-navy dark:text-white">
+                                SelUP — сервис привлечения клиентов для селлеров
+                            </h1>
+<p class="text-lg md:text-xl text-brand-muted dark:text-gray-400 font-medium max-w-lg">
+                                Ваши клиенты приводят новых покупателей. Вы платите только за выкупленные заказы.
+                            </p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="lp-cta bg-primary text-brand-navy text-base font-extrabold px-8 py-4 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all text-center" href="#contacts">
+                                Получить консультацию
+                            </a>
+</div>
+<div class="flex items-center gap-4 text-sm font-semibold text-brand-muted">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-primary">check_circle</span> Бесплатный запуск</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-primary">check_circle</span> Быстрый старт</span>
+</div>
+</div>
+<div class="relative">
+<div class="lp-hero-visual lp-surface w-full aspect-[4/3] bg-gradient-to-br from-[#e7f3eb] to-primary/10 rounded-2xl border border-primary/10 overflow-hidden shadow-2xl flex items-center justify-center" data-alt="Dashboard interface preview for referral management platform">
+<svg aria-label="Витрина SelUP и аналитика" class="w-[92%] h-[92%]" fill="none" role="img" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="lg-lens" cx="0" cy="0" r="1" gradientTransform="translate(400 280) rotate(90) scale(260 320)">
+<stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/>
+<stop offset="0.35" stop-color="#ffffff" stop-opacity="0.35"/>
+<stop offset="0.7" stop-color="#78b4ff" stop-opacity="0.18"/>
+<stop offset="1" stop-color="#13ec5b" stop-opacity="0.08"/>
+</radialGradient>
+<linearGradient id="lg-rim" x1="0" x2="1" y1="0" y2="0">
+<stop offset="0" stop-color="#ffffff" stop-opacity="0.65"/>
+<stop offset="0.5" stop-color="#13ec5b" stop-opacity="0.22"/>
+<stop offset="1" stop-color="#78b4ff" stop-opacity="0.30"/>
+</linearGradient>
+<filter id="lg-soft" x="-40" y="-40" width="880" height="680" color-interpolation-filters="sRGB">
+<feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#0d1b12" flood-opacity="0.10"/>
+</filter>
+</defs>
+<g filter="url(#lg-soft)">
+<rect x="90" y="70" width="620" height="460" rx="34" fill="rgba(255,255,255,0.30)" stroke="rgba(13,27,18,0.10)" stroke-width="2"/>
+<circle cx="410" cy="290" r="210" fill="url(#lg-lens)"/>
+<circle cx="410" cy="290" r="210" stroke="url(#lg-rim)" stroke-width="10" opacity="0.85"/>
+<path d="M210 360c70-90 150-120 230-88 72 28 122 10 170-50" stroke="#13ec5b" stroke-opacity="0.26" stroke-width="10" stroke-linecap="round"/>
+<path d="M240 410c88-70 160-86 236-52 66 30 114 22 154-22" stroke="#78b4ff" stroke-opacity="0.24" stroke-width="8" stroke-linecap="round"/>
+<g stroke="#0d1b12" stroke-opacity="0.14" stroke-width="2" stroke-linecap="round">
+<path d="M150 150H330"/>
+<path d="M150 190H330"/>
+<path d="M150 230H330"/>
+<path d="M150 270H330"/>
+<path d="M150 310H330"/>
+<path d="M470 150H650"/>
+<path d="M470 190H650"/>
+<path d="M470 230H650"/>
+</g>
+</g>
+</svg>
+</div>
+</div>
+</div>
+</section>
+<!-- Pain Points Section -->
+<section class="px-6 py-20 bg-background-light dark:bg-background-dark/50">
+<div class="mx-auto max-w-[1200px]">
+<div class="flex flex-col gap-4 mb-12 max-w-2xl">
+<h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">Комиссии маркетплейсов съедают вашу прибыль?</h2>
+<p class="text-lg text-brand-muted dark:text-gray-400">Условия меняются каждые несколько месяцев, комиссии уже доходят до 50%, реклама дорожает, а маржа тает. SelUP меняет правила игры.</p>
+</div>
+<div class="grid md:grid-cols-3 gap-6">
+<div class="lp-surface lp-lift p-8 rounded-2xl bg-white dark:bg-gray-900 border border-[#cfe7d7] dark:border-white/5 flex flex-col gap-4">
+<span class="material-symbols-outlined text-4xl text-red-500">currency_ruble</span>
+<h3 class="text-xl font-bold">Комиссии до 50%</h3>
+<p class="text-brand-muted dark:text-gray-400">Ставки и правила растут и меняются — планировать маржу становится сложнее.</p>
+</div>
+<div class="lp-surface lp-lift p-8 rounded-2xl bg-white dark:bg-gray-900 border border-[#cfe7d7] dark:border-white/5 flex flex-col gap-4">
+<span class="material-symbols-outlined text-4xl text-red-500">campaign</span>
+<h3 class="text-xl font-bold">Реклама дорожает</h3>
+<p class="text-brand-muted dark:text-gray-400">Бюджеты уходят в клики и охваты — без гарантии выкупленных заказов.</p>
+</div>
+<div class="lp-surface lp-lift p-8 rounded-2xl bg-white dark:bg-gray-900 border border-[#cfe7d7] dark:border-white/5 flex flex-col gap-4">
+<span class="material-symbols-outlined text-4xl text-red-500">trending_down</span>
+<h3 class="text-xl font-bold">Маржа тает</h3>
+<p class="text-brand-muted dark:text-gray-400">Чем выше расходы на привлечение, тем сложнее масштабировать продажи.</p>
+</div>
+</div>
+</div>
+</section>
+	<!-- Solution Section -->
+	<section class="px-6 py-12">
+	<div class="mx-auto max-w-[1200px]">
+	<div class="bg-brand-navy dark:bg-primary/10 rounded-3xl p-8 md:p-12 overflow-hidden relative group">
+	<div class="absolute inset-0 bg-primary opacity-5 mix-blend-overlay"></div>
+	<div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+	<div class="flex flex-col gap-4">
+	<span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold w-fit uppercase tracking-wider">Наше решение</span>
+	<h2 class="text-3xl md:text-5xl font-black text-white leading-tight"><span class="text-primary underline decoration-primary/40 underline-offset-8">Модель SelUP</span>: Сначала продажи — потом оплата</h2>
+	<p class="text-lg text-gray-400 max-w-xl">Вы инвестируете в результат, а не в охваты.</p>
+	</div>
+<a class="lp-cta bg-primary text-brand-navy px-10 py-5 rounded-2xl font-black text-lg hover:scale-105 transition-transform shrink-0 text-center" href="#contacts">
+		                                Получить консультацию
+		                            </a>
+</div>
+</div>
+</div>
+</section>
+<!-- How it works (Customer Journey) -->
+<section class="px-6 py-20 bg-background-light dark:bg-background-dark/30" id="process">
+<div class="mx-auto max-w-[1200px]">
+<div class="text-center mb-16">
+<h2 class="text-3xl md:text-5xl font-extrabold mb-4">Пусть клиенты продают за вас</h2>
+<p class="text-xl text-brand-muted dark:text-gray-400 max-w-3xl mx-auto">Лояльные покупатели рекомендуют ваш бренд друзьям и подписчикам — в соцсетях, мессенджерах и личных блогах. Это не прямая реклама, а честные рекомендации на основе реального опыта — поэтому они дают высокую конверсию.</p>
+</div>
+<div class="grid md:grid-cols-4 gap-8 relative">
+<div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent -translate-y-1/2"></div>
+<div class="lp-surface lp-lift relative z-10 flex flex-col items-center text-center gap-4 bg-white dark:bg-gray-900 p-6 rounded-2xl border border-primary/10 shadow-sm">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-brand-navy shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-3xl">shopping_bag</span>
+</div>
+<h4 class="font-bold text-lg leading-tight">Покупатель уже с вами</h4>
+<p class="text-sm text-brand-muted dark:text-gray-400">После покупки получает приглашение рекомендовать и делиться витриной</p>
+</div>
+<div class="lp-surface lp-lift relative z-10 flex flex-col items-center text-center gap-4 bg-white dark:bg-gray-900 p-6 rounded-2xl border border-primary/10 shadow-sm">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-brand-navy shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-3xl">link</span>
+</div>
+<h4 class="font-bold text-lg leading-tight">Получает персональную ссылку</h4>
+<p class="text-sm text-brand-muted dark:text-gray-400">SelUP создаёт витрину и уникальную ссылку, чтобы всё корректно считалось</p>
+</div>
+<div class="lp-surface lp-lift relative z-10 flex flex-col items-center text-center gap-4 bg-white dark:bg-gray-900 p-6 rounded-2xl border border-primary/10 shadow-sm">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-brand-navy shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-3xl">share</span>
+</div>
+<h4 class="font-bold text-lg leading-tight">Делится рекомендацией</h4>
+<p class="text-sm text-brand-muted dark:text-gray-400">В соцсетях, мессенджерах и личных блогах — там, где доверие сильнее рекламы</p>
+</div>
+<div class="lp-surface lp-lift relative z-10 flex flex-col items-center text-center gap-4 bg-white dark:bg-gray-900 p-6 rounded-2xl border border-primary/10 shadow-sm">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-brand-navy shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-3xl">payments</span>
+</div>
+<h4 class="font-bold text-lg leading-tight">Бонус за реальный результат</h4>
+<p class="text-sm text-brand-muted dark:text-gray-400">Друг оформляет заказ в витрине SelUP — бонус начисляется после оплаты и выкупа</p>
+</div>
+</div>
+</div>
+</section>
+	<!-- Setup (4 steps) -->
+	<section class="px-6 py-20 bg-white dark:bg-background-dark" id="setup">
+	<div class="mx-auto max-w-[1200px]">
+	<div class="text-center mb-16">
+	<h2 class="text-3xl md:text-5xl font-extrabold mb-4">Всё сделаем сами</h2>
+	<p class="text-xl text-brand-muted">Вам нужно только оставить заявку. Дальше подключаем CRM, собираем витрину и запускаем рекомендации.</p>
+	</div>
+	<div class="grid md:grid-cols-4 gap-8 relative">
+	<!-- Connecting Line (Desktop) -->
+	<div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent -translate-y-1/2"></div>
+		<div class="lp-surface lp-lift relative z-10 flex flex-col items-center text-center gap-4 bg-white dark:bg-gray-900 p-6 rounded-2xl border border-primary/5">
+	<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-brand-navy shadow-lg shadow-primary/20">
+	<span class="material-symbols-outlined text-3xl">cloud_upload</span>
+	</div>
+	<h4 class="font-bold text-lg leading-tight">Подключаем CRM и каталог</h4>
+	<p class="text-sm text-brand-muted">Подключаем вашу CRM, чтобы загрузить каталог на платформу и учитывать заказы и выкупы</p>
+	</div>
+		<div class="lp-surface lp-lift relative z-10 flex flex-col items-center text-center gap-4 bg-white dark:bg-gray-900 p-6 rounded-2xl border border-primary/5">
+	<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-brand-navy shadow-lg shadow-primary/20">
+	<span class="material-symbols-outlined text-3xl">storefront</span>
+	</div>
+<h4 class="font-bold text-lg leading-tight">Создаём витрину товаров</h4>
+<p class="text-sm text-brand-muted">Собираем мобильную витрину SelUP и выдаём ссылки рекомендателям</p>
+</div>
+<div class="lp-surface lp-lift relative z-10 flex flex-col items-center text-center gap-4 bg-white dark:bg-gray-900 p-6 rounded-2xl border border-primary/5">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-brand-navy shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-3xl">share</span>
+</div>
+<h4 class="font-bold text-lg leading-tight">Клиенты рекомендуют</h4>
+<p class="text-sm text-brand-muted">Делятся ссылкой в соцсетях, мессенджерах и личных блогах</p>
+</div>
+<div class="lp-surface lp-lift relative z-10 flex flex-col items-center text-center gap-4 bg-white dark:bg-gray-900 p-6 rounded-2xl border border-primary/5">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-brand-navy shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-3xl">payments</span>
+</div>
+<h4 class="font-bold text-lg leading-tight">Начисляем и выплачиваем вознаграждение</h4>
+<p class="text-sm text-brand-muted">Покупатель оформляет заказ в витрине SelUP. Вознаграждение — после оплаты и выкупа</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Benefits -->
+<section class="px-6 py-20 bg-background-light dark:bg-background-dark/30" id="features">
+<div class="mx-auto max-w-[1200px]">
+<div class="grid md:grid-cols-3 gap-8">
+<div class="lp-surface lp-lift bg-white dark:bg-gray-900 p-10 rounded-3xl border border-primary/10 shadow-sm hover:shadow-xl transition-all">
+<div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined">rocket_launch</span>
+</div>
+<h3 class="text-2xl font-bold mb-4 leading-tight">Рост без аванса на рекламу</h3>
+<p class="text-brand-muted dark:text-gray-400">Не нужно заранее вкладываться в трафик. Расходы формируются из части прибыли от уже совершенных продаж.</p>
+</div>
+<div class="lp-surface lp-lift bg-white dark:bg-gray-900 p-10 rounded-3xl border border-primary/10 shadow-sm hover:shadow-xl transition-all">
+<div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<h3 class="text-2xl font-bold mb-4 leading-tight">Доверие к бренду</h3>
+<p class="text-brand-muted dark:text-gray-400">Рекомендации реальных покупателей обычно конвертируют лучше, чем холодная реклама.</p>
+</div>
+<div class="lp-surface lp-lift bg-white dark:bg-gray-900 p-10 rounded-3xl border border-primary/10 shadow-sm hover:shadow-xl transition-all">
+<div class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<h3 class="text-2xl font-bold mb-4 leading-tight">Предсказуемые расходы</h3>
+<p class="text-brand-muted dark:text-gray-400">Вы заранее понимаете стоимость привлечения клиента. Фиксированная комиссия упрощает планирование юнит-экономики.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Payment Model -->
+<section class="px-6 py-20 bg-white dark:bg-background-dark" id="pricing">
+<div class="mx-auto max-w-[960px] text-center">
+<h2 class="text-4xl md:text-5xl font-black mb-12">Платите только за результат</h2>
+<div class="lp-surface bg-primary text-brand-navy p-10 rounded-[2.5rem] shadow-2xl relative">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-brand-navy text-white text-xs font-black px-6 py-2 rounded-full tracking-widest uppercase">
+                            Модель сотрудничества
+                        </div>
+<div class="flex flex-col items-center gap-4">
+<div class="text-6xl md:text-8xl font-black tracking-tighter">Фикс %</div>
+<p class="text-xl md:text-2xl font-bold max-w-lg">Комиссия только за оплаченный и выкупленный заказ</p>
+<div class="h-px w-full bg-brand-navy/10 my-4"></div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8 w-full">
+<div class="flex flex-col gap-1">
+<span class="text-3xl font-black">0₽</span>
+<span class="text-xs font-bold uppercase">Вход</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-3xl font-black">0₽</span>
+<span class="text-xs font-bold uppercase">Поддержка</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-3xl font-black">100%</span>
+<span class="text-xs font-bold uppercase">Прозрачность расчетов</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-3xl font-black">∞</span>
+<span class="text-xs font-bold uppercase">Масштабирование</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Full Service -->
+<section class="px-6 py-20 bg-background-light dark:bg-background-dark/30">
+<div class="mx-auto max-w-[1200px]">
+<h2 class="text-3xl md:text-4xl font-extrabold mb-12 text-center">Все инструменты в одном окне</h2>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+<div class="flex items-start gap-5">
+<span class="material-symbols-outlined text-primary text-3xl">hub</span>
+<div>
+<h4 class="font-bold text-lg mb-1">CRM интеграция</h4>
+<p class="text-brand-muted text-sm">Синхронизация заказов с вашей CRM.</p>
+</div>
+</div>
+<div class="flex items-start gap-5">
+<span class="material-symbols-outlined text-primary text-3xl">store</span>
+<div>
+<h4 class="font-bold text-lg mb-1">Витрины товаров</h4>
+<p class="text-brand-muted text-sm">Автоматические мобильные витрины под ваши товары</p>
+</div>
+</div>
+<div class="flex items-start gap-5">
+<span class="material-symbols-outlined text-primary text-3xl">link</span>
+<div>
+<h4 class="font-bold text-lg mb-1">Реферальные ссылки</h4>
+<p class="text-brand-muted text-sm">Автоматическая генерация уникальных ссылок для каждого клиента.</p>
+</div>
+</div>
+<div class="flex items-start gap-5">
+<span class="material-symbols-outlined text-primary text-3xl">history_edu</span>
+<div>
+<h4 class="font-bold text-lg mb-1">Маркировка рекламы</h4>
+<p class="text-brand-muted text-sm">Соответствие требованиям по маркировке рекламы — берем на себя.</p>
+</div>
+</div>
+<div class="flex items-start gap-5">
+<span class="material-symbols-outlined text-primary text-3xl">monitoring</span>
+<div>
+<h4 class="font-bold text-lg mb-1">Аналитика</h4>
+<p class="text-brand-muted text-sm">Метрики по каждому рекомендателю: заказы, выкупы, начисления и эффективность</p>
+</div>
+</div>
+<div class="flex items-start gap-5">
+<span class="material-symbols-outlined text-primary text-3xl">account_balance_wallet</span>
+<div>
+<h4 class="font-bold text-lg mb-1">Выплаты</h4>
+<p class="text-brand-muted text-sm">Автоматизированный процесс вознаграждения участников программы.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+	<!-- Footer CTA -->
+	<section class="px-6 py-24 bg-white dark:bg-background-dark overflow-hidden relative" id="contacts">
+	<div class="absolute -right-20 -bottom-20 w-96 h-96 bg-primary/10 rounded-full blur-[100px]"></div>
+	<div class="mx-auto max-w-[1200px] grid md:grid-cols-2 gap-16 items-center relative z-10">
+<div class="flex flex-col gap-6">
+<h2 class="text-4xl md:text-5xl font-black">Готовы масштабировать продажи?</h2>
+<p class="text-xl text-brand-muted">Оставьте заявку на бесплатную консультацию</p>
+<div class="flex flex-col gap-4 mt-4">
+<div class="flex items-center gap-3">
+<span class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">call</span>
+</span>
+<span class="font-bold text-lg">+7 (999) 000-00-00</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">mail</span>
+</span>
+<span class="font-bold text-lg">hello@selup.ru</span>
+</div>
+</div>
+</div>
+<div class="lp-surface bg-background-light dark:bg-gray-900 p-8 md:p-10 rounded-[2rem] border border-primary/10 shadow-xl">
+<form class="flex flex-col gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold uppercase tracking-wider text-brand-muted">Ваше имя</label>
+<input class="w-full px-5 py-4 rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark focus:ring-primary focus:border-primary transition-all" placeholder="Иван Иванов" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold uppercase tracking-wider text-brand-muted">Телефон</label>
+<input class="w-full px-5 py-4 rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark focus:ring-primary focus:border-primary transition-all" placeholder="+7 (___) ___-__-__" type="tel"/>
+</div>
+<button class="lp-cta bg-primary text-brand-navy w-full py-5 rounded-xl font-black text-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all mt-2" type="submit">
+	                                Получить консультацию
+	                            </button>
+<p class="text-[10px] text-center text-brand-muted uppercase font-bold tracking-widest opacity-60">
+                                Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности
+                            </p>
+	</form>
+	</div>
+	</div>
+	<!-- FAQ -->
+	<section class="mt-16 md:mt-20" id="faq">
+	<div class="mx-auto max-w-[960px]">
+	<div class="text-center mb-12">
+	<h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">FAQ</h2>
+	<p class="text-lg text-brand-muted dark:text-gray-400 mt-3">Короткие ответы на частые вопросы.</p>
+	</div>
+	<div class="flex flex-col gap-4">
+		<details class="lp-surface group bg-background-light dark:bg-gray-900 border border-primary/10 rounded-2xl p-6">
+	<summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">
+	<span>Что такое «выкупленный заказ» и как учитываются возвраты?</span>
+	<span class="material-symbols-outlined text-primary transition-transform group-open:rotate-180">expand_more</span>
+	</summary>
+	<div class="mt-4 text-brand-muted dark:text-gray-400 leading-relaxed">
+	Выкупленный заказ — это заказ, который оплачен и не ушел в отмену/возврат по итогам периода подтверждения. Если заказ возвращен, он не считается результатом и не участвует в расчете вознаграждения.
+	</div>
+	</details>
+		<details class="lp-surface group bg-background-light dark:bg-gray-900 border border-primary/10 rounded-2xl p-6">
+	<summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">
+	<span>Где происходит покупка: SelUP, сайт бренда или маркетплейс?</span>
+	<span class="material-symbols-outlined text-primary transition-transform group-open:rotate-180">expand_more</span>
+	</summary>
+	<div class="mt-4 text-brand-muted dark:text-gray-400 leading-relaxed">
+	Покупатель оформляет заказ в витрине/чекауте SelUP. Так мы можем прозрачно связать заказ с рекомендателем и учитывать оплату и выкуп.
+	</div>
+	</details>
+		<details class="lp-surface group bg-background-light dark:bg-gray-900 border border-primary/10 rounded-2xl p-6">
+	<summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">
+	<span>Какие интеграции на старте?</span>
+	<span class="material-symbols-outlined text-primary transition-transform group-open:rotate-180">expand_more</span>
+	</summary>
+	<div class="mt-4 text-brand-muted dark:text-gray-400 leading-relaxed">
+	На старте подключаем вашу CRM, чтобы загрузить каталог на платформу, учитывать заказы и выкупы и прозрачно считать результат.
+	</div>
+	</details>
+		<details class="lp-surface group bg-background-light dark:bg-gray-900 border border-primary/10 rounded-2xl p-6">
+	<summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">
+	<span>Как работают вознаграждения рекомендателям?</span>
+	<span class="material-symbols-outlined text-primary transition-transform group-open:rotate-180">expand_more</span>
+	</summary>
+	<div class="mt-4 text-brand-muted dark:text-gray-400 leading-relaxed">
+	Вознаграждение начисляется по факту оплаченного и выкупленного заказа. Вы платите фиксированную комиссию только за результат — без кликов и показов.
+	</div>
+	</details>
+		<details class="lp-surface group bg-background-light dark:bg-gray-900 border border-primary/10 rounded-2xl p-6">
+	<summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">
+	<span>Как быстро можно запуститься?</span>
+	<span class="material-symbols-outlined text-primary transition-transform group-open:rotate-180">expand_more</span>
+	</summary>
+	<div class="mt-4 text-brand-muted dark:text-gray-400 leading-relaxed">
+	Нужно только оставить заявку. Мы свяжемся, обсудим задачу и поможем всё подключить и запустить.
+	</div>
+	</details>
+	</div>
+	</div>
+	</section>
+	</section>
+	</main>
+	<footer class="bg-brand-navy text-white px-6 py-12 border-t border-white/5">
+	<div class="mx-auto max-w-[1200px] flex flex-col md:flex-row justify-between items-center gap-8">
+	<div class="flex items-center gap-2">
+<div class="text-primary">
+<svg class="size-6" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 18.4228L42 11.475V34.3663C42 34.7796 41.7457 35.1504 41.3601 35.2992L24 42V18.4228Z" fill="currentColor" fill-rule="evenodd"></path>
+<path clip-rule="evenodd" d="M24 8.18819L33.4123 11.574L24 15.2071L14.5877 11.574L24 8.18819ZM9 15.8487L21 20.4805V37.6263L9 32.9945V15.8487ZM27 37.6263V20.4805L39 15.8487V32.9945L27 37.6263ZM25.354 2.29885C24.4788 1.98402 23.5212 1.98402 22.646 2.29885L4.98454 8.65208C3.7939 9.08038 3 10.2097 3 11.475V34.3663C3 36.0196 4.01719 37.5026 5.55962 38.098L22.9197 44.7987C23.6149 45.0671 24.3851 45.0671 25.0803 44.7987L42.4404 38.098C43.9828 37.5026 45 36.0196 45 34.3663V11.475C45 10.2097 44.2061 9.08038 43.0155 8.65208L25.354 2.29885Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="text-xl font-extrabold tracking-tight">SelUP</span>
+</div>
+<div class="text-gray-400 text-sm">
+                    © 2026 SelUP
+                </div>
+<div class="flex gap-6">
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Telegram</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">VKontakte</a>
+</div>
+</div>
+</footer>
+<script>
+(() => {
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reduce && reduce.matches) return;
+
+    const root = document.documentElement;
+    const body = document.body;
+    const sections = Array.from(document.querySelectorAll("main > section"));
+    if (!sections.length) return;
+
+    const indexBySection = new Map(sections.map((section, index) => [section, index]));
+    let lastActive = -1;
+
+    const io = new IntersectionObserver(
+        (entries) => {
+            for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                const idx = indexBySection.get(entry.target);
+                if (typeof idx !== "number") continue;
+                if (idx === lastActive) continue;
+                lastActive = idx;
+                body.dataset.active = String(idx);
+            }
+        },
+        { threshold: 0.55 }
+    );
+
+    sections.forEach((s) => io.observe(s));
+
+    let raf = 0;
+    const update = () => {
+        raf = 0;
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        const docH = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        const n = Math.min(1, Math.max(0, scrollY / docH));
+        root.style.setProperty("--lp-scroll", String(scrollY));
+        root.style.setProperty("--lp-scroll-n", n.toFixed(4));
+        root.style.setProperty("--lp-vh", String(window.innerHeight));
+        root.style.setProperty("--lp-t", String(Date.now() * 0.001));
+    };
+
+    const request = () => {
+        if (raf) return;
+        raf = requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", request, { passive: true });
+    window.addEventListener("resize", request);
+    request();
+})();
+</script>
+</div>
+</body></html>
