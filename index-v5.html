@@ -75,7 +75,7 @@
                 }
             }
 
-            /* FAQ accordion */
+            /* Вопросы и ответы accordion */
             .faq-panel {
                 max-height: 0px;
                 opacity: 0;
@@ -523,7 +523,7 @@
 </section>
 <section class="py-20 bg-background-light dark:bg-background-dark scroll-mt-24" id="faq">
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-<h2 class="text-3xl font-bold text-center text-secondary dark:text-white mb-2" data-reveal>FAQ</h2>
+<h2 class="text-3xl font-bold text-center text-secondary dark:text-white mb-2" data-reveal>Вопросы и ответы</h2>
 <p class="text-center text-text-muted-light dark:text-text-muted-dark mb-12 text-sm" data-reveal>Короткие ответы на частые вопросы.</p>
 <div class="space-y-4">
 <div class="bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden transition-all border border-gray-200/70 dark:border-gray-800" data-reveal>
@@ -585,7 +585,7 @@
 <a class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary rounded-md px-1.5 py-1" href="#pricing">Модель оплаты</a>
 <a class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary rounded-md px-1.5 py-1" href="#tools">Возможности</a>
 <a class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary rounded-md px-1.5 py-1" href="#contacts">Контакты</a>
-<a class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary rounded-md px-1.5 py-1" href="#faq">FAQ</a>
+<a class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary rounded-md px-1.5 py-1" href="#faq">Вопросы и ответы</a>
 </nav>
 <div class="flex gap-6">
 <a class="inline-flex items-center justify-center transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary rounded-md p-1" href="#" aria-label="Telegram">
@@ -606,7 +606,7 @@
 </footer>
 
 <script>
-    // UI: mobile nav, smooth anchor focus, reveal on scroll, FAQ accordion
+    // UI: mobile nav, smooth anchor focus, reveal on scroll, Вопросы и ответы accordion
     (function () {
         const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -760,7 +760,7 @@
             sections.forEach((s) => navIo.observe(s));
         }
 
-        // FAQ accordion
+        // Вопросы и ответы accordion
         const faqButtons = Array.from(document.querySelectorAll("[data-faq-button]"));
 
         function closeFaqPanel(panel, button, icon) {
